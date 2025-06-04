@@ -1,0 +1,32 @@
+{
+	"name": "@dabrowskif/simplecli",
+	"description": "Simple arg parsing tool for CLI libraries",
+	"version": "0.1.0",
+	"license": "MIT",
+	"author": "dabrowskif",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"scripts": {
+		"format": "biome format . --write",
+		"lint": "biome lint .",
+		"check": "biome check .",
+		"build": "tsc -p tsconfig.build.json",
+		"test": "npx tsx ./test/test.ts"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dabrowskif/simplecli.git"
+	},
+	"keywords": ["javascript", "typescript", "utility", "esm", "cli"],
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/node": "^22.15.29",
+		"typescript": "^5.8.3"
+	}
+}
