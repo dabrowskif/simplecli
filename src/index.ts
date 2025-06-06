@@ -120,7 +120,9 @@ export class CLI<
 
     return final as Prettify<{
       [K in keyof ArgStore]: InferArgumentType<
-        ArgStore[K]["type"] extends undefined ? "string" : ArgStore[K]["type"],
+        ArgStore[K]["type"] extends undefined
+          ? Opts["defaultType"]
+          : ArgStore[K]["type"],
         ArgStore[K]["required"] extends undefined
           ? Opts["defaultRequired"]
           : ArgStore[K]["required"]
