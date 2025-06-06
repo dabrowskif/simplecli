@@ -6,6 +6,7 @@ export type CLIOptions<
 	defaultRequired?: DefaultRequired;
 	ignoreUnknownArgs?: boolean;
 	preventDuplicateArgs?: boolean;
+	explicitBooleanValues?: boolean;
 };
 
 export type Argument<

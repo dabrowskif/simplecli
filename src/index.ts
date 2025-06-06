@@ -5,6 +5,7 @@ const defaults: CLIOptions<'string', false> = {
 	defaultRequired: false,
 	ignoreUnknownArgs: true,
 	preventDuplicateArgs: true,
+	explicitBooleanValues: false,
 	// TODO: is as const needed?
 } as const;
 
@@ -126,11 +127,30 @@ export class CLI<
 					value,
 				});
 			} else {
-				// if "--key value" format, we have to get next object from the list because it is arg value
-				const value = args.shift();
+				const matchingArg = this.args.find((a) => a.cliKeys.includes(arg));
+
+				let isBoolean = false;
+				if (matchingArg?.type === 'boolean' || (!matchingArg?.type && this.opts.defaultType === 'boolean')) {
+					isBoolean = true;
+				}
+
+				const value = (() => {
+					// if boolean, we support '--my-bool --my-other-string value'
+					if (isBoolean) {
+						// if explicitBooleanValues, require '--my-bool true/false'
+						if (this.opts.explicitBooleanValues) {
+							return args.shift();
+						}
+						return 'true';
+					}
+
+					// if "--key value" format, we have to get next object from the list because it is arg value
+					return args.shift();
+				})();
 
 				// throw if no value or "--key1 --key2=value" was passed
-				if (value === undefined || value.startsWith('-')) {
+				// if (value === undefined || value.startsWith('-')) {
+				if (value === undefined) {
 					throw new Error(`Arg ${arg} was provided without a value.`);
 				}
 
