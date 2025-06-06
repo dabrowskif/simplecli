@@ -20,7 +20,12 @@ export class CLI<
 	private argv?: string[];
 	private readonly args: Argument<CLIKey[], string, boolean | undefined, ArgumentType | undefined>[] = [];
 
-	private opts: CLIOptions<ArgumentType, boolean> = defaults;
+	private opts: CLIOptions<ArgumentType, boolean>;
+
+	constructor() {
+		// spread to dereference during unit tests
+		this.opts = { ...defaults };
+	}
 
 	withOptions<
 		DefaultType extends ArgumentType | undefined = undefined,
@@ -33,6 +38,7 @@ export class CLI<
 				this.opts[tKey] = opts[tKey] as any;
 			}
 		}
+		console.log(this.opts, defaults);
 
 		type NewDefaultType = DefaultType extends undefined ? Opts['defaultType'] : DefaultType;
 		type NewDefaultRequired = DefaultRequired extends undefined ? Opts['defaultRequired'] : DefaultRequired;

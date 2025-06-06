@@ -22,7 +22,8 @@
 		"check:fix": "biome check . --write",
 		"check:ci": "biome ci .",
 		"build": "tsc -p tsconfig.build.json",
-		"test:unit": "echo tested!",
+		"test:unit": "vitest run",
+		"test:unit:watch": "vitest",
 		"test:manual": "npx tsx ./test/test.ts",
 		"prepublishOnly": "yarn build"
 	},
@@ -45,7 +46,8 @@
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/node": "^22.15.29",
-		"typescript": "^5.8.3"
+		"typescript": "^5.8.3",
+		"vitest": "^3.2.2"
 	},
 	"engines": {
 		"node": ">=18"

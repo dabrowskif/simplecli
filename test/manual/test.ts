@@ -1,4 +1,4 @@
-import { CLI } from '../src';
+import { CLI } from '../../src';
 
 const cli = new CLI()
 	.addArg({
