@@ -1,11 +1,12 @@
 {
 	"compilerOptions": {
-		"target": "esnext",
 		"module": "esnext",
+		"target": "esnext",
 		"moduleResolution": "node",
 		"strict": true,
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
+		"useUnknownInCatchVariables": true,
 		"skipLibCheck": true
 	},
 	"include": ["src", "test"]

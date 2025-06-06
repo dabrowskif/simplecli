@@ -27,6 +27,7 @@ const cli = new CLI()
 		defaultRequired: true,
 		defaultType: 'boolean',
 	})
+	.withArgv(['-1', '1', '-2', 'true', '-3', 'false'])
 	.build();
 
 console.log(cli);

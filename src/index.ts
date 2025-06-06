@@ -14,6 +14,7 @@ export class CLI<
 	>,
 	// biome-ignore lint/complexity/noBannedTypes: don't care
 	ArgStore extends Record<string, { type: ArgumentType; required: boolean }> = {},
+	OmittedKeys extends string = '',
 > {
 	private argv?: string[];
 	private readonly args: Argument<string[], string, boolean | undefined, ArgumentType | undefined>[] = [];
@@ -35,14 +36,16 @@ export class CLI<
 		type NewDefaultType = DefaultType extends undefined ? Opts['defaultType'] : DefaultType;
 		type NewDefaultRequired = DefaultRequired extends undefined ? Opts['defaultRequired'] : DefaultRequired;
 		type NewOptions = Required<CLIOptions<NewDefaultType, NewDefaultRequired>>;
-		type NewCli = CLI<NewOptions, ArgStore>;
+		type NewOmittedKeys = OmittedKeys | 'withOptions';
+		type NewCli = CLI<NewOptions, ArgStore, NewOmittedKeys>;
 
-		return this as Omit<NewCli, 'withOptions'>;
+		return this as Omit<NewCli, NewOmittedKeys>;
 	}
 
 	withArgv(argv: string[]) {
 		this.argv = argv;
-		return this as Omit<CLI<Opts, ArgStore>, 'withArgv'>;
+		type NewOmittedKeys = OmittedKeys | 'withArgv';
+		return this as Omit<CLI<Opts, ArgStore, NewOmittedKeys>, NewOmittedKeys>;
 	}
 
 	addArg<
@@ -60,7 +63,8 @@ export class CLI<
 					type: Type;
 					required: Required;
 				};
-			}
+			},
+			OmittedKeys
 		>;
 	}
 
