@@ -10,7 +10,7 @@ export type CLIOptions<
 };
 
 export type Argument<
-	CliKeys extends string[],
+	CliKeys extends CLIKey[],
 	JsonKey extends string,
 	Required extends boolean | undefined,
 	Type extends ArgumentType | undefined,
@@ -20,6 +20,8 @@ export type Argument<
 	required?: Required;
 	type?: Type;
 };
+
+export type CLIKey = `-${string}` | `--${string}`;
 
 export type ArgumentType = 'boolean' | 'number' | 'string';
 

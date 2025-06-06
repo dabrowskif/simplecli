@@ -1,4 +1,4 @@
-import type { Argument, ArgumentType, CLIOptions, InferArgumentType } from './types';
+import type { Argument, ArgumentType, CLIKey, CLIOptions, InferArgumentType } from './types';
 
 const defaults: CLIOptions<'string', false> = {
 	defaultType: 'string',
@@ -18,7 +18,7 @@ export class CLI<
 	OmittedKeys extends string = '',
 > {
 	private argv?: string[];
-	private readonly args: Argument<string[], string, boolean | undefined, ArgumentType | undefined>[] = [];
+	private readonly args: Argument<CLIKey[], string, boolean | undefined, ArgumentType | undefined>[] = [];
 
 	private opts: CLIOptions<ArgumentType, boolean> = defaults;
 
@@ -50,11 +50,11 @@ export class CLI<
 	}
 
 	addArg<
-		CliKeys extends string[],
+		CLIKeys extends CLIKey[],
 		JsonKey extends string,
 		Required extends boolean | undefined = undefined,
 		Type extends ArgumentType | undefined = undefined,
-	>(arg: Argument<CliKeys, JsonKey, Required, Type>) {
+	>(arg: Argument<CLIKeys, JsonKey, Required, Type>) {
 		this.args.push(arg);
 
 		return this as CLI<
@@ -77,7 +77,7 @@ export class CLI<
 		// find first required arg that was not passed
 		const requiredNotPassedArg = this.args
 			.filter((arg) => arg.required === true || (arg.required === undefined && this.opts?.defaultRequired))
-			.find((arg) => !extractedArgs.some((exArg) => arg.cliKeys.includes(exArg.key)));
+			.find((arg) => !extractedArgs.some((exArg) => arg.cliKeys.includes(exArg.key as CLIKey)));
 
 		if (requiredNotPassedArg) {
 			throw new Error(`Arg ${requiredNotPassedArg.cliKeys[0]} was not provided`);
@@ -127,7 +127,7 @@ export class CLI<
 					value,
 				});
 			} else {
-				const matchingArg = this.args.find((a) => a.cliKeys.includes(arg));
+				const matchingArg = this.args.find((a) => a.cliKeys.includes(arg as CLIKey));
 
 				let isBoolean = false;
 				if (matchingArg?.type === 'boolean' || (!matchingArg?.type && this.opts.defaultType === 'boolean')) {
@@ -165,7 +165,7 @@ export class CLI<
 	}
 
 	private parseArg(arg: { key: string; value: string }) {
-		const argInput = this.args.find((a) => a.cliKeys.includes(arg.key));
+		const argInput = this.args.find((a) => a.cliKeys.includes(arg.key as CLIKey));
 
 		if (argInput) {
 			const value = (() => {

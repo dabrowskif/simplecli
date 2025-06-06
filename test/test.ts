@@ -7,6 +7,11 @@ const cli = new CLI()
 		type: 'number',
 	})
 	.addArg({
+		cliKeys: ['-1'],
+		jsonKey: '1',
+		type: 'number',
+	})
+	.addArg({
 		cliKeys: ['-2'],
 		jsonKey: '2',
 	})
@@ -26,7 +31,7 @@ const cli = new CLI()
 		defaultRequired: true,
 		defaultType: 'boolean',
 	})
-	.withArgv(['-1', '1', '-2=false', '-4', '4', '-3'])
+	.withArgv(['-1', '1', '-2=false', '-4', '4', '-3', '-2=true'])
 	.build();
 
 console.log(cli);
