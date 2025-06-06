@@ -18,7 +18,6 @@ const args = new CLI()
   .addArg({
     cliKeys: ['--name', '-n'],
     jsonKey: 'name',
-    type: 'string',
     required: true
   })
   .addArg({
@@ -46,10 +45,10 @@ new CLI()
 #### `.withOptions(options)`
 ```typescript
 interface CLIOptions {
-  defaultType?: 'string' | 'number' | 'boolean';
-  defaultRequired?: boolean;
-  ignoreUnknownArgs?: boolean;
-  preventDuplicateArgs?: boolean;
+  defaultType?: 'string' | 'number' | 'boolean';    // Default: 'string'
+  defaultRequired?: boolean;                         // Default: false
+  ignoreUnknownArgs?: boolean;                       // Default: true
+  preventDuplicateArgs?: boolean;                    // Default: true
 }
 ```
 
@@ -62,7 +61,7 @@ interface Argument {
   cliKeys: string[];          // ['--name', '-n']
   jsonKey: string;            // Key in result object
   required?: boolean;         // Override default
-  type?: 'string' | 'number' | 'boolean';
+  type?: 'string' | 'number' | 'boolean'; // Override default
 }
 ```
 
@@ -82,10 +81,6 @@ Parse arguments and return typed result.
 ```typescript
 const config = new CLI()
   .withArgv(process.argv.slice(2)) // Optional
-  .withOptions({
-    defaultType: 'string',
-    defaultRequired: false
-  })
   .addArg({
     cliKeys: ['--port', '-p'],
     jsonKey: 'port',
@@ -103,7 +98,3 @@ const config = new CLI()
 const port = config.port ?? 3000;
 if (config.verbose) console.log('Verbose mode');
 ```
-
-## License
-
-MIT
