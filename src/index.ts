@@ -1,9 +1,9 @@
 import type { Argument, ArgumentType, CLIOptions, InferArgumentType } from './types';
 
-const defaults: CLIOptions<'string', true> = {
+const defaults: CLIOptions<'string', false> = {
 	defaultType: 'string',
-	defaultRequired: true,
-	ignoreUnknownArgs: false,
+	defaultRequired: false,
+	ignoreUnknownArgs: true,
 	preventDuplicateArgs: true,
 	// TODO: is as const needed?
 } as const;
