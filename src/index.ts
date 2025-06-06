@@ -14,7 +14,7 @@ const defaults: CLIOptions<"string", true> = {
 } as const;
 
 export class CLI<
-  Opts extends Required<
+  Opts extends Required<CLIOptions<ArgumentType, boolean>> = Required<
     CLIOptions<typeof defaults.defaultType, typeof defaults.defaultRequired>
   >,
   ArgStore = {},
@@ -29,16 +29,46 @@ export class CLI<
 
   private opts: CLIOptions<ArgumentType, boolean> = defaults;
 
-  withOptions<T extends ArgumentType, V extends boolean>(
-    opts: CLIOptions<T, V>,
-  ) {
+  withOptions<
+    DefaultType extends ArgumentType | undefined = undefined,
+    DefaultRequired extends boolean | undefined = undefined,
+  >(opts: CLIOptions<DefaultType, DefaultRequired>) {
+    // for (const opt of opts) {
+    //   this.mergeOpt(opt);
+    // }
+    // @FIXME: prepare this.mergeOpt function
     this.opts = {
       ...this.opts,
       ...opts,
     };
 
-    return this;
+    return this as CLI<
+      Required<
+        CLIOptions<
+          DefaultType extends undefined ? Opts["defaultType"] : DefaultType,
+          DefaultRequired extends undefined
+            ? Opts["defaultRequired"]
+            : DefaultRequired
+        >
+      >,
+      ArgStore,
+      Out
+      // Prettify<
+      // {
+      //   [K in Out]: InferArgumentType<
+      //     Type extends undefined ? "string" : Type,
+      //     Required extends undefined ? Opts["defaultRequired"] : Required
+      //   >;
+      // }
+      // >
+    >;
   }
+
+  // private mergeOpt<K extends keyof CLIOptions>(opt: keyof CLIOptions, undefined>, val: ) {
+  //   if (val !== undefined) {
+  //     this.opts[opt] = val;
+  //   }
+  // }
 
   addArg<
     CliKeys extends string[],

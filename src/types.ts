@@ -1,6 +1,6 @@
 export type CLIOptions<
-  DefaultType extends ArgumentType | undefined,
-  DefaultRequired extends boolean | undefined,
+  DefaultType extends ArgumentType | undefined = undefined,
+  DefaultRequired extends boolean | undefined = undefined,
 > = {
   defaultType?: DefaultType;
   defaultRequired?: DefaultRequired;
