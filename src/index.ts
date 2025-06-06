@@ -23,6 +23,7 @@ export class CLI<
     { type: ArgumentType; required: boolean }
   > = {},
 > {
+  private argv?: string[];
   private readonly args: Argument<
     string[],
     string,
@@ -63,6 +64,10 @@ export class CLI<
   //     this.opts[opt] = val;
   //   }
   // }
+  withArgv(argv: string[]) {
+    this.argv = argv;
+    return this as Omit<CLI<Opts, ArgStore>, "withArgv">;
+  }
 
   addArg<
     CliKeys extends string[],
@@ -84,7 +89,7 @@ export class CLI<
   }
 
   build() {
-    const args = process.argv.slice(2);
+    const args = this.argv ?? process.argv.slice(2);
     const extractedArgs = this.extractArgs(args);
 
     // @TODO: extract to function
