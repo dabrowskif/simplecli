@@ -29,6 +29,7 @@ const cli = new CLI()
 	})
 	.build();
 
+console.log(cli);
 cli[1].toFixed();
 cli[2]?.valueOf();
 cli[3].valueOf();

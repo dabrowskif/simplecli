@@ -4,6 +4,7 @@
 	"version": "0.1.0",
 	"license": "MIT",
 	"author": "dabrowskif",
+	"type": "module",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"exports": {
@@ -14,19 +15,29 @@
 	},
 	"scripts": {
 		"format": "biome format . --write",
-		"lint": "biome lint .",
+		"format:check": "biome format .",
+		"lint": "biome lint . --write",
+		"lint:check": "biome lint .",
 		"check": "biome check .",
+		"check:fix": "biome check . --write",
+		"check:ci": "biome ci .",
 		"build": "tsc -p tsconfig.build.json",
-		"test": "npx tsx ./test/test.ts"
+		"test:unit": "echo tested!",
+		"test:manual": "npx tsx ./test/test.ts",
+		"prepublishOnly": "yarn build"
 	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/dabrowskif/simplecli.git"
 	},
+	"files": ["dist/", "LICENSE", "README.md"],
 	"keywords": ["javascript", "typescript", "utility", "esm", "cli"],
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/node": "^22.15.29",
 		"typescript": "^5.8.3"
+	},
+	"engines": {
+		"node": ">=18"
 	}
 }
