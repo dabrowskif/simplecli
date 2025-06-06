@@ -1,7 +1,7 @@
 {
 	"name": "@dabrowskif/simplecli",
 	"description": "Simple arg parsing tool for CLI libraries",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"license": "MIT",
 	"author": "dabrowskif",
 	"type": "module",
