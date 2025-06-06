@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.3.0](https://github.com/dabrowskif/simplecli/compare/v0.2.0...v0.3.0) (2025-06-06)
+
+
+### Features
+
+* add implicit booleans ([497b2c4](https://github.com/dabrowskif/simplecli/commit/497b2c40a4b8d4f93d6dd663b587d3966138dd3c))
+* add typed CLIKey ([065ecf2](https://github.com/dabrowskif/simplecli/commit/065ecf240d852dc6b3a2bebb667321321da66256))
+* add typed jsonKey ([32bbd4e](https://github.com/dabrowskif/simplecli/commit/32bbd4e5d731dcd6e526cb9501ecffe6a3e71627))
+* forbid used cli keys ([f1fa6a2](https://github.com/dabrowskif/simplecli/commit/f1fa6a233dd080349d24b0dd31781fc3acc9273c))
+
+
+### Bug Fixes
+
+* change defaultRequired value ([879dd9a](https://github.com/dabrowskif/simplecli/commit/879dd9aad17e4121e07b5fd06c4ee48d683b03c8))
+
 ## 0.2.0 (2025-06-06)
 
 
