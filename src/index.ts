@@ -11,14 +11,17 @@ const defaults: CLIOptions<"string", true> = {
   defaultRequired: true,
   ignoreUnknownArgs: false,
   preventDuplicateArgs: true,
+  // TODO: is as const needed?
 } as const;
 
 export class CLI<
   Opts extends Required<CLIOptions<ArgumentType, boolean>> = Required<
     CLIOptions<typeof defaults.defaultType, typeof defaults.defaultRequired>
   >,
-  ArgStore = {},
-  Out = {},
+  ArgStore extends Record<
+    string,
+    { type: ArgumentType; required: boolean }
+  > = {},
 > {
   private readonly args: Argument<
     string[],
@@ -51,16 +54,7 @@ export class CLI<
             : DefaultRequired
         >
       >,
-      ArgStore,
-      Out
-      // Prettify<
-      // {
-      //   [K in Out]: InferArgumentType<
-      //     Type extends undefined ? "string" : Type,
-      //     Required extends undefined ? Opts["defaultRequired"] : Required
-      //   >;
-      // }
-      // >
+      ArgStore
     >;
   }
 
@@ -80,15 +74,12 @@ export class CLI<
 
     return this as CLI<
       Opts,
-      ArgStore,
-      Prettify<
-        Out & {
-          [K in JsonKey]: InferArgumentType<
-            Type extends undefined ? "string" : Type,
-            Required extends undefined ? Opts["defaultRequired"] : Required
-          >;
-        }
-      >
+      ArgStore & {
+        [K in JsonKey]: {
+          type: Type;
+          required: Required;
+        };
+      }
     >;
   }
 
@@ -117,7 +108,7 @@ export class CLI<
 
     const parsed = extractedArgs.map((a) => this.parseArg(a));
 
-    return parsed.reduce<Record<string, unknown>>((acc, curr) => {
+    const final = parsed.reduce<Record<string, unknown>>((acc, curr) => {
       if (curr) {
         if (acc[curr.key] !== undefined && this.opts?.preventDuplicateArgs) {
           throw new Error(`Duplicate key ${curr.key}. Args must be unique.`);
@@ -125,7 +116,16 @@ export class CLI<
         acc[curr.key] = curr.value;
       }
       return acc;
-    }, {}) as Out;
+    }, {});
+
+    return final as Prettify<{
+      [K in keyof ArgStore]: InferArgumentType<
+        ArgStore[K]["type"] extends undefined ? "string" : ArgStore[K]["type"],
+        ArgStore[K]["required"] extends undefined
+          ? Opts["defaultRequired"]
+          : ArgStore[K]["required"]
+      >;
+    }>;
   }
 
   private extractArgs(args: string[]) {
