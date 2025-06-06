@@ -1,4 +1,4 @@
-import type { Argument, ArgumentType, CLIKey, CLIOptions, UsedCLIKeys, InferArgumentType } from './types';
+import type { Argument, ArgumentType, CLIKey, CLIOptions, InferArgumentType, UsedCLIKeys } from './types';
 
 const defaults: CLIOptions<'string', false> = {
 	defaultType: 'string',
