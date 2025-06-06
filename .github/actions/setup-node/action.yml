@@ -1,0 +1,22 @@
+name: Install NPM deps
+description: Installs, using cache, npm dependencies for project
+
+inputs:
+  node_ver:
+    description: Node version
+    type: number
+    required: false
+    default: 22
+
+runs:
+  using: composite
+  steps:
+    - name: Setup node
+      uses: actions/setup-node@v4
+      with:
+        cache: yarn
+        node-version: ${{ inputs.node_ver }}
+        registry-url: https://registry.npmjs.org
+    - name: Install yarn dependencies
+      run: yarn install --frozen-lockfile
+      shell: bash

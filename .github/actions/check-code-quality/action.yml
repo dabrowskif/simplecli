@@ -1,0 +1,12 @@
+name: Check code quality
+description: Run pre-checks (linting, formatting) and tests (unit) for project
+
+runs:
+  using: composite
+  steps:
+    - name: Check code quality
+      run: yarn check:ci
+      shell: bash
+    - name: Run unit tests
+      run: yarn test:unit
+      shell: bash
