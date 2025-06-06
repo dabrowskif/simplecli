@@ -1,42 +1,62 @@
-import { ArgumentType, Argument, Prettify, InferArgumentType } from "./types";
+import {
+  ArgumentType,
+  Argument,
+  CLIOptions,
+  Prettify,
+  InferArgumentType,
+} from "./types";
 
-export type Options<
-  DefaultType extends ArgumentType,
-  DefaultRequired extends boolean,
-> = {
-  defaultType?: DefaultType;
-  defaultRequired?: DefaultRequired;
-  ignoreUnknownArgs?: boolean;
-  preventDuplicateArgs?: boolean;
-};
-
-const defaults = {
+const defaults: CLIOptions<"string", true> = {
   defaultType: "string",
   defaultRequired: true,
   ignoreUnknownArgs: false,
   preventDuplicateArgs: true,
 } as const;
 
-export class CLI<Out = {}> {
-  private readonly args: Argument<string[], string, boolean, ArgumentType>[] =
-    [];
+export class CLI<
+  Opts extends Required<
+    CLIOptions<typeof defaults.defaultType, typeof defaults.defaultRequired>
+  >,
+  ArgStore = {},
+  Out = {},
+> {
+  private readonly args: Argument<
+    string[],
+    string,
+    boolean | undefined,
+    ArgumentType | undefined
+  >[] = [];
 
-  private opts: Options<ArgumentType, boolean> = defaults;
+  private opts: CLIOptions<ArgumentType, boolean> = defaults;
 
-  constructor() {}
+  withOptions<T extends ArgumentType, V extends boolean>(
+    opts: CLIOptions<T, V>,
+  ) {
+    this.opts = {
+      ...this.opts,
+      ...opts,
+    };
+
+    return this;
+  }
 
   addArg<
     CliKeys extends string[],
     JsonKey extends string,
-    Required extends boolean,
-    Type extends ArgumentType,
+    Required extends boolean | undefined = undefined,
+    Type extends ArgumentType | undefined = undefined,
   >(arg: Argument<CliKeys, JsonKey, Required, Type>) {
     this.args.push(arg);
 
     return this as CLI<
+      Opts,
+      ArgStore,
       Prettify<
         Out & {
-          [K in JsonKey]: InferArgumentType<Type, Required>;
+          [K in JsonKey]: InferArgumentType<
+            Type extends undefined ? "string" : Type,
+            Required extends undefined ? Opts["defaultRequired"] : Required
+          >;
         }
       >
     >;

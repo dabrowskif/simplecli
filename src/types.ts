@@ -1,8 +1,18 @@
+export type CLIOptions<
+  DefaultType extends ArgumentType | undefined,
+  DefaultRequired extends boolean | undefined,
+> = {
+  defaultType?: DefaultType;
+  defaultRequired?: DefaultRequired;
+  ignoreUnknownArgs?: boolean;
+  preventDuplicateArgs?: boolean;
+};
+
 export type Argument<
   CliKeys extends string[],
   JsonKey extends string,
-  Required extends boolean,
-  Type extends ArgumentType,
+  Required extends boolean | undefined,
+  Type extends ArgumentType | undefined,
 > = {
   cliKeys: CliKeys;
   jsonKey: JsonKey;
