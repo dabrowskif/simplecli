@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/dabrowskif/simplecli/compare/v0.3.0...v0.4.0) (2025-06-06)
+
+
+### Features
+
+* basic vitest testing ([25a7551](https://github.com/dabrowskif/simplecli/commit/25a755136a48a78ea1a8f9c33632bce7b3b1272b))
+
 ## [0.3.0](https://github.com/dabrowskif/simplecli/compare/v0.2.0...v0.3.0) (2025-06-06)
 
 
