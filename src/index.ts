@@ -14,7 +14,7 @@ export class CLI<
 		CLIOptions<typeof defaults.defaultType, typeof defaults.defaultRequired>
 	>,
 	// biome-ignore lint/complexity/noBannedTypes: don't care
-	ArgStore extends Record<string, { type: ArgumentType; required: boolean }> = {},
+	ArgStore extends Record<string, { cliKeys: CLIKey; type: ArgumentType; required: boolean }> = {},
 	OmittedKeys extends string = '',
 > {
 	private argv?: string[];
@@ -54,13 +54,14 @@ export class CLI<
 		JsonKey extends string,
 		Required extends boolean | undefined = undefined,
 		Type extends ArgumentType | undefined = undefined,
-	>(arg: Argument<CLIKeys, JsonKey, Required, Type>) {
+	>(arg: Argument<CLIKeys, JsonKey extends keyof ArgStore ? never : JsonKey, Required, Type>) {
 		this.args.push(arg);
 
 		return this as CLI<
 			Opts,
 			ArgStore & {
 				[K in JsonKey]: {
+					cliKeys: CLIKeys;
 					type: Type;
 					required: Required;
 				};
