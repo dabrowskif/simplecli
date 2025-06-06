@@ -1,4 +1,4 @@
-import type { Argument, ArgumentType, CLIKey, CLIOptions, InferArgumentType } from './types';
+import type { Argument, ArgumentType, CLIKey, CLIOptions, UsedCLIKeys, InferArgumentType } from './types';
 
 const defaults: CLIOptions<'string', false> = {
 	defaultType: 'string',
@@ -54,7 +54,14 @@ export class CLI<
 		JsonKey extends string,
 		Required extends boolean | undefined = undefined,
 		Type extends ArgumentType | undefined = undefined,
-	>(arg: Argument<CLIKeys, JsonKey extends keyof ArgStore ? never : JsonKey, Required, Type>) {
+	>(
+		arg: Argument<
+			CLIKeys[number] extends UsedCLIKeys<ArgStore> ? never : CLIKeys,
+			JsonKey extends keyof ArgStore ? never : JsonKey,
+			Required,
+			Type
+		>,
+	) {
 		this.args.push(arg);
 
 		return this as CLI<

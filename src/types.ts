@@ -10,18 +10,21 @@ export type CLIOptions<
 };
 
 export type Argument<
-	CliKeys extends CLIKey[],
+	CLIKeys extends CLIKey[],
 	JsonKey extends string,
 	Required extends boolean | undefined,
 	Type extends ArgumentType | undefined,
 > = {
-	cliKeys: CliKeys;
+	cliKeys: CLIKeys;
 	jsonKey: JsonKey;
 	required?: Required;
 	type?: Type;
 };
 
 export type CLIKey = `-${string}` | `--${string}`;
+export type ArgStore = Record<string, { cliKeys: CLIKey; type: ArgumentType; required: boolean }>;
+
+export type UsedCLIKeys<S extends ArgStore> = S[keyof S]['cliKeys'][number];
 
 export type ArgumentType = 'boolean' | 'number' | 'string';
 

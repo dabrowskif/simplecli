@@ -3,13 +3,14 @@ import { CLI } from '../src';
 const cli = new CLI()
 	.addArg({
 		cliKeys: ['-1'],
-		jsonKey: '1',
+		jsonKey: 'firstKey',
 		type: 'number',
 	})
 	.addArg({
-		cliKeys: ['-1'],
-		jsonKey: '1',
+		cliKeys: ['-5'],
+		jsonKey: 'secondKey',
 		type: 'number',
+		required: false,
 	})
 	.addArg({
 		cliKeys: ['-2'],
@@ -31,11 +32,11 @@ const cli = new CLI()
 		defaultRequired: true,
 		defaultType: 'boolean',
 	})
-	.withArgv(['-1', '1', '-2=false', '-4', '4', '-3', '-2=true'])
+	.withArgv(['-1', '1', '-2=false', '-4', '4', '-3'])
 	.build();
 
 console.log(cli);
-cli[1].toFixed();
-cli[2]?.valueOf();
+cli.firstKey.toFixed();
+cli.secondKey?.valueOf();
 cli[3].valueOf();
 cli[4]?.toFixed();
