@@ -1,10 +1,4 @@
-import {
-  ArgumentType,
-  Argument,
-  CLIOptions,
-  Prettify,
-  InferArgumentType,
-} from "./types";
+import { ArgumentType, Argument, CLIOptions, InferArgumentType } from "./types";
 
 const defaults: CLIOptions<"string", true> = {
   defaultType: "string",
@@ -37,33 +31,26 @@ export class CLI<
     DefaultType extends ArgumentType | undefined = undefined,
     DefaultRequired extends boolean | undefined = undefined,
   >(opts: CLIOptions<DefaultType, DefaultRequired>) {
-    // for (const opt of opts) {
-    //   this.mergeOpt(opt);
-    // }
-    // @FIXME: prepare this.mergeOpt function
-    this.opts = {
-      ...this.opts,
-      ...opts,
-    };
+    for (const key in opts) {
+      const tKey = key as keyof typeof opts;
+      if (opts[tKey] !== undefined) {
+        // @FIXME: try to fix "as any"
+        this.opts[tKey] = opts[tKey] as any;
+      }
+    }
 
-    return this as CLI<
-      Required<
-        CLIOptions<
-          DefaultType extends undefined ? Opts["defaultType"] : DefaultType,
-          DefaultRequired extends undefined
-            ? Opts["defaultRequired"]
-            : DefaultRequired
-        >
-      >,
-      ArgStore
-    >;
+    type NewDefaultType = DefaultType extends undefined
+      ? Opts["defaultType"]
+      : DefaultType;
+    type NewDefaultRequired = DefaultRequired extends undefined
+      ? Opts["defaultRequired"]
+      : DefaultRequired;
+    type NewOptions = Required<CLIOptions<NewDefaultType, NewDefaultRequired>>;
+    type NewCli = CLI<NewOptions, ArgStore>;
+
+    return this as Omit<NewCli, "withOptions">;
   }
 
-  // private mergeOpt<K extends keyof CLIOptions>(opt: keyof CLIOptions, undefined>, val: ) {
-  //   if (val !== undefined) {
-  //     this.opts[opt] = val;
-  //   }
-  // }
   withArgv(argv: string[]) {
     this.argv = argv;
     return this as Omit<CLI<Opts, ArgStore>, "withArgv">;
@@ -123,7 +110,7 @@ export class CLI<
       return acc;
     }, {});
 
-    return final as Prettify<{
+    return final as {
       [K in keyof ArgStore]: InferArgumentType<
         ArgStore[K]["type"] extends undefined
           ? Opts["defaultType"]
@@ -132,7 +119,7 @@ export class CLI<
           ? Opts["defaultRequired"]
           : ArgStore[K]["required"]
       >;
-    }>;
+    };
   }
 
   private extractArgs(args: string[]) {
@@ -194,7 +181,7 @@ export class CLI<
             const numValue = Number(arg.value);
             if (Number.isNaN(numValue)) {
               throw new Error(
-                `Arg ${arg.key} should be number, but ${arg.value} was provided.`,
+                `Arg ${arg.key} should be number, but ${typeof arg.value} (${arg.value}) was provided.`,
               );
             }
             return numValue;
@@ -208,7 +195,7 @@ export class CLI<
               return false;
             }
             throw new Error(
-              `Arg ${arg.key} should be boolean, but ${arg.value} was provided.`,
+              `Arg ${arg.key} should be boolean, but ${typeof arg.value} (${arg.value}) was provided.`,
             );
         }
       })();
