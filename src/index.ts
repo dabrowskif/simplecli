@@ -1,143 +1,173 @@
-export type ArgumentInput = {
-	cliKeys: string[];
-	jsonKey: string;
-	required?: boolean;
-	type?: 'bool' | 'number' | 'string';
+import { ArgumentType, Argument, Prettify, InferArgumentType } from "./types";
+
+export type Options<
+  DefaultType extends ArgumentType,
+  DefaultRequired extends boolean,
+> = {
+  defaultType?: DefaultType;
+  defaultRequired?: DefaultRequired;
+  ignoreUnknownArgs?: boolean;
+  preventDuplicateArgs?: boolean;
 };
 
-export type ArgumentOutput<T = unknown> = {
-	key: string;
-	value: T;
-};
+const defaults = {
+  defaultType: "string",
+  defaultRequired: true,
+  ignoreUnknownArgs: false,
+  preventDuplicateArgs: true,
+} as const;
 
-type Options = {
-	defaultType?: 'bool' | 'number' | 'string';
-	defaultRequired?: boolean;
-	ignoreUnknownArgs?: boolean;
-	preventDuplicateArgs?: boolean;
-};
+export class CLI<Out = {}> {
+  private readonly args: Argument<string[], string, boolean, ArgumentType>[] =
+    [];
 
-export class CLI {
-	constructor(
-		private readonly args: ArgumentInput[],
-		private readonly opts?: Options,
-	) {
-		this.opts = {
-			defaultType: 'string',
-			defaultRequired: true,
-			ignoreUnknownArgs: false,
-			preventDuplicateArgs: true,
-			...opts,
-		};
-	}
+  private opts: Options<ArgumentType, boolean> = defaults;
 
-	run() {
-		const args = process.argv.slice(2);
-		const extractedArgs = this.extractArgs(args);
+  constructor() {}
 
-		// @TODO: extract to function
-		// find first required arg that was not passed
-		const requiredNotPassedArg = this.args
-			.filter((arg) => arg.required === true || (arg.required === undefined && this.opts?.defaultRequired))
-			.find((arg) => !extractedArgs.some((exArg) => arg.cliKeys.includes(exArg.key)));
+  addArg<
+    CliKeys extends string[],
+    JsonKey extends string,
+    Required extends boolean,
+    Type extends ArgumentType,
+  >(arg: Argument<CliKeys, JsonKey, Required, Type>) {
+    this.args.push(arg);
 
-		if (requiredNotPassedArg) {
-			throw new Error(`Arg ${requiredNotPassedArg.cliKeys[0]} was not provided`);
-		}
+    return this as CLI<
+      Prettify<
+        Out & {
+          [K in JsonKey]: InferArgumentType<Type, Required>;
+        }
+      >
+    >;
+  }
 
-		const parsed = extractedArgs.map((a) => this.parseArg(a));
+  build() {
+    const args = process.argv.slice(2);
+    const extractedArgs = this.extractArgs(args);
 
-		return parsed.reduce<Record<string, unknown>>((acc, curr) => {
-			if (curr) {
-				if (acc[curr.key] !== undefined && this.opts?.preventDuplicateArgs) {
-					throw new Error(`Duplicate key ${curr.key}. Args must be unique.`);
-				}
-				acc[curr.key] = curr.value;
-			}
-			return acc;
-		}, {});
-	}
+    // @TODO: extract to function
+    // find first required arg that was not passed
+    const requiredNotPassedArg = this.args
+      .filter(
+        (arg) =>
+          arg.required === true ||
+          (arg.required === undefined && this.opts?.defaultRequired),
+      )
+      .find(
+        (arg) =>
+          !extractedArgs.some((exArg) => arg.cliKeys.includes(exArg.key)),
+      );
 
-	private extractArgs(args: string[]) {
-		const parsed: {
-			key: string;
-			value: string;
-		}[] = [];
+    if (requiredNotPassedArg) {
+      throw new Error(
+        `Arg ${requiredNotPassedArg.cliKeys[0]} was not provided`,
+      );
+    }
 
-		while (args.length > 0) {
-			const arg = args.shift() as string;
+    const parsed = extractedArgs.map((a) => this.parseArg(a));
 
-			if (!arg.startsWith('-')) {
-				throw new Error(`Wrong arg formatting ${arg}. Arg should start with either '-' or '--'`);
-			}
+    return parsed.reduce<Record<string, unknown>>((acc, curr) => {
+      if (curr) {
+        if (acc[curr.key] !== undefined && this.opts?.preventDuplicateArgs) {
+          throw new Error(`Duplicate key ${curr.key}. Args must be unique.`);
+        }
+        acc[curr.key] = curr.value;
+      }
+      return acc;
+    }, {}) as Out;
+  }
 
-			// handle arg that has "--key=value" format
-			if (arg.includes('=')) {
-				const separatorIdx = arg.indexOf('=');
-				const key = arg.slice(0, separatorIdx);
-				const value = arg.slice(separatorIdx + 1, arg.length);
+  private extractArgs(args: string[]) {
+    const parsed: {
+      key: string;
+      value: string;
+    }[] = [];
 
-				parsed.push({
-					key,
-					value,
-				});
-			} else {
-				// if "--key value" format, we have to get next object from the list because it is arg value
-				const value = args.shift();
+    while (args.length > 0) {
+      const arg = args.shift() as string;
 
-				// throw if no value or "--key1 --key2=value" was passed
-				if (value === undefined || value.startsWith('-')) {
-					throw new Error(`Arg ${arg} was provided without a value.`);
-				}
+      if (!arg.startsWith("-")) {
+        throw new Error(
+          `Wrong arg formatting ${arg}. Arg should start with either '-' or '--'`,
+        );
+      }
 
-				parsed.push({
-					key: arg,
-					value,
-				});
-			}
-		}
+      // handle arg that has "--key=value" format
+      if (arg.includes("=")) {
+        const separatorIdx = arg.indexOf("=");
+        const key = arg.slice(0, separatorIdx);
+        const value = arg.slice(separatorIdx + 1, arg.length);
 
-		return parsed;
-	}
+        parsed.push({
+          key,
+          value,
+        });
+      } else {
+        // if "--key value" format, we have to get next object from the list because it is arg value
+        const value = args.shift();
 
-	private parseArg(arg: { key: string; value: string }): ArgumentOutput | null {
-		const argInput = this.args.find((a) => a.cliKeys.includes(arg.key));
+        // throw if no value or "--key1 --key2=value" was passed
+        if (value === undefined || value.startsWith("-")) {
+          throw new Error(`Arg ${arg} was provided without a value.`);
+        }
 
-		if (argInput) {
-			const value = (() => {
-				const type = argInput.type ?? this.opts?.defaultType;
+        parsed.push({
+          key: arg,
+          value,
+        });
+      }
+    }
 
-				switch (type) {
-					case 'string':
-						return arg.value as string;
+    return parsed;
+  }
 
-					case 'number': {
-						const numValue = Number(arg.value);
-						if (Number.isNaN(numValue)) {
-							throw new Error(`Arg ${arg.key} should be number, but ${arg.value} was provided.`);
-						}
-						return numValue;
-					}
+  private parseArg(arg: { key: string; value: string }) {
+    const argInput = this.args.find((a) => a.cliKeys.includes(arg.key));
 
-					case 'bool':
-						if (arg.value === 'true') {
-							return true;
-						}
-						if (arg.value === 'false') {
-							return false;
-						}
-						throw new Error(`Arg ${arg.key} should be boolean, but ${arg.value} was provided.`);
-				}
-			})();
+    if (argInput) {
+      const value = (() => {
+        const type = argInput.type ?? this.opts?.defaultType;
 
-			return {
-				key: argInput.jsonKey,
-				value,
-			};
-		}
-		if (!this.opts?.ignoreUnknownArgs && !argInput) {
-			throw new Error(`Unknown arg ${arg.key}. Ensure it's provided in CLI arguments.`);
-		}
-		return null;
-	}
+        switch (type) {
+          case "string":
+            return arg.value as string;
+
+          case "number": {
+            const numValue = Number(arg.value);
+            if (Number.isNaN(numValue)) {
+              throw new Error(
+                `Arg ${arg.key} should be number, but ${arg.value} was provided.`,
+              );
+            }
+            return numValue;
+          }
+
+          case "boolean":
+            if (arg.value === "true") {
+              return true;
+            }
+            if (arg.value === "false") {
+              return false;
+            }
+            throw new Error(
+              `Arg ${arg.key} should be boolean, but ${arg.value} was provided.`,
+            );
+        }
+      })();
+
+      return {
+        key: argInput.jsonKey,
+        value,
+      };
+    }
+
+    if (!this.opts?.ignoreUnknownArgs && !argInput) {
+      throw new Error(
+        `Unknown arg ${arg.key}. Ensure it's provided in CLI arguments.`,
+      );
+    }
+
+    return null;
+  }
 }
