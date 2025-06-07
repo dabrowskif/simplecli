@@ -38,7 +38,6 @@ export class CLI<
 				this.opts[tKey] = opts[tKey] as any;
 			}
 		}
-		console.log(this.opts, defaults);
 
 		type NewDefaultType = DefaultType extends undefined ? Opts['defaultType'] : DefaultType;
 		type NewDefaultRequired = DefaultRequired extends undefined ? Opts['defaultRequired'] : DefaultRequired;
