@@ -18,7 +18,7 @@
 		"format:ci": "biome format .",
 		"lint": "biome lint . --write",
 		"lint:ci": "biome lint .",
-		"check": "biome check . --write",
+		"check:write": "biome check . --write",
 		"check:ci": "biome ci .",
 		"build": "tsc -p tsconfig.build.json",
 		"test:unit": "vitest run",
