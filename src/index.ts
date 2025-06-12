@@ -6,8 +6,7 @@ const defaults: CLIOptions<'string', false> = {
 	ignoreUnknownArgs: true,
 	preventDuplicateArgs: true,
 	explicitBooleanValues: false,
-	// TODO: is as const needed?
-} as const;
+};
 
 export class CLI<
 	Opts extends Required<CLIOptions<ArgumentType, boolean>> = Required<
