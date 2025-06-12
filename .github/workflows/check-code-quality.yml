@@ -17,6 +17,6 @@ jobs:
       - name: Setup node
         uses: ./.github/actions/setup-node
         with:
-          node_ver: 22
+          node_ver: ${{ matrix.node_ver }}
       - name: Check code quality
         uses: ./.github/actions/check-code-quality
