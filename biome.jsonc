@@ -19,6 +19,12 @@
 			"recommended": true,
 			"correctness": {
 				"noUnusedImports": "error"
+			},
+			"complexity": {
+				"noBannedTypes": "warn"
+			},
+			"suspicious": {
+				"noExplicitAny": "warn"
 			}
 		}
 	},

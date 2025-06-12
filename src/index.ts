@@ -1,6 +1,6 @@
 import type { Argument, ArgumentType, CLIKey, CLIOptions, InferArgumentType, UsedCLIKeys } from './types';
 
-const defaults: CLIOptions<'string', false> = {
+const defaults: Required<CLIOptions<'string', false>> = {
 	defaultType: 'string',
 	defaultRequired: false,
 	ignoreUnknownArgs: true,
@@ -12,19 +12,15 @@ export class CLI<
 	Opts extends Required<CLIOptions<ArgumentType, boolean>> = Required<
 		CLIOptions<typeof defaults.defaultType, typeof defaults.defaultRequired>
 	>,
-	// biome-ignore lint/complexity/noBannedTypes: don't care
 	ArgStore extends Record<string, { cliKeys: CLIKey; type: ArgumentType; required: boolean }> = {},
 	OmittedKeys extends string = '',
 > {
 	private argv?: string[];
 	private readonly args: Argument<CLIKey[], string, boolean | undefined, ArgumentType | undefined>[] = [];
 
-	private opts: CLIOptions<ArgumentType, boolean>;
-
-	constructor() {
-		// spread to dereference during unit tests
-		this.opts = { ...defaults };
-	}
+	private opts: Required<CLIOptions<ArgumentType, boolean>> = {
+		...defaults,
+	};
 
 	withOptions<
 		DefaultType extends ArgumentType | undefined = undefined,
@@ -33,8 +29,8 @@ export class CLI<
 		for (const key in opts) {
 			const tKey = key as keyof typeof opts;
 			if (opts[tKey] !== undefined) {
-				// biome-ignore lint/suspicious/noExplicitAny: FIXME:
-				this.opts[tKey] = opts[tKey] as any;
+				// @ts-expect-error - FIXME:
+				this.opts[tKey] = opts[tKey];
 			}
 		}
 
@@ -181,7 +177,7 @@ export class CLI<
 
 		if (argInput) {
 			const value = (() => {
-				const type = argInput.type ?? this.opts?.defaultType;
+				const type = argInput.type ?? this.opts.defaultType;
 
 				switch (type) {
 					case 'string':
@@ -203,6 +199,12 @@ export class CLI<
 							return false;
 						}
 						throw new Error(`Arg ${arg.key} should be boolean, but ${typeof arg.value} (${arg.value}) was provided.`);
+
+					default: {
+						const exhaust = (_: never) => {};
+						exhaust(type);
+						throw new Error('Unhandled argument type. This is not expected');
+					}
 				}
 			})();
 

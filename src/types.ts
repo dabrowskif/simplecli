@@ -38,15 +38,3 @@ export type TypeMap<Required extends boolean> = {
 };
 
 export type Prettify<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
-
-//START ToTuple helpers
-type UnionToParam<U> = U extends unknown ? (k: U) => void : never;
-type UnionToSect<U> = UnionToParam<U> extends (k: infer I) => void ? I : never;
-type ExtractParam<F> = F extends (a: infer A) => void ? A : never;
-type SpliceOne<Union> = Exclude<Union, ExtractOne<Union>>;
-type ExtractOne<Union> = ExtractParam<UnionToSect<UnionToParam<Union>>>;
-type ToTupleRec<Union, Res extends unknown[]> = SpliceOne<Union> extends never
-	? [ExtractOne<Union>, ...Res]
-	: ToTupleRec<SpliceOne<Union>, [ExtractOne<Union>, ...Res]>;
-export type ToTuple<Union> = ToTupleRec<Union, []>;
-//END ToTuple helpers
